@@ -1,4 +1,4 @@
-package com.cenkeraydin.todoapp.model
+package com.cenkeraydin.todoapp.view
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
