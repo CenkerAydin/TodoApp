@@ -33,4 +33,3 @@ class TodoAdapter(private val todoList:ArrayList<Todo>, private val listener:Lis
        holder.bind(todoList[position],colors, position, listener)
         }
     }
-}
