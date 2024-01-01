@@ -1,35 +1,47 @@
 package com.cenkeraydin.todoapp.Adapter
 
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.AsyncListDiffer
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.cenkeraydin.todoapp.databinding.ItemTodoBinding
 import com.cenkeraydin.todoapp.model.Todo
 
-class TodoAdapter(private val todoList:ArrayList<Todo>, private val listener:Listener): RecyclerView.Adapter<TodoAdapter.TodoViewHolder>() {
-    interface Listener{
-        fun onItemClick(todoModel:Todo)
-    }
-    private val colors:Array<String> = arrayOf("#e86343","#f5dcd1","#ffa07a","#dec158","#e44803","#949587","#195765","#03363e")
+class TodoAdapter : RecyclerView.Adapter<TodoAdapter.TodoViewHolder>() {
 
-    class TodoViewHolder(val binding:ItemTodoBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class TodoViewHolder(val binding: ItemTodoBinding) : RecyclerView.ViewHolder(binding.root)
 
-        fun bind(todoModel: Todo,colors:Array<String>,position:Int, listener: Listener){
-            itemView.setOnClickListener{
-                listener.onItemClick(todoModel)
-            }
-            itemView.setBackgroundColor(Color.parseColor(colors[position % 8]))
-            binding.tvTitle.text=todoModel.todo
-            binding.cbDone.isChecked=todoModel.completed
+    private val diffCallback = object : DiffUtil.ItemCallback<Todo>() {
+        override fun areItemsTheSame(oldItem: Todo, newItem: Todo): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: Todo, newItem: Todo): Boolean {
+            return oldItem == newItem
         }
     }
-    override fun getItemCount() =todoList.size
+
+    private val differ = AsyncListDiffer(this, diffCallback)
+    var todos: List<Todo>
+        get() = differ.currentList
+        set(value) { differ.submitList(value) }
+
+    override fun getItemCount() = todos.size
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TodoViewHolder {
-        return TodoViewHolder(ItemTodoBinding.inflate( LayoutInflater.from(parent.context),parent,false))
+        return TodoViewHolder(ItemTodoBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
+        ))
     }
 
     override fun onBindViewHolder(holder: TodoViewHolder, position: Int) {
-       holder.bind(todoList[position],colors, position, listener)
+        holder.binding.apply {
+            val todo = todos[position]
+            tvTitle.text = todo.title
+            cbDone.isChecked = todo.completed
         }
     }
+}
